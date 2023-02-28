@@ -25,7 +25,7 @@ class PostgresVectorStore(VectorStore):
     """
 
     stores_text: bool = False
-    user_id: str
+    indexed_results: List[NodeEmbeddingResult] = []
 
     def __init__(
         self,
@@ -52,6 +52,7 @@ class PostgresVectorStore(VectorStore):
         for result in embedding_results:
             embedding = "{" + ",".join(str(x) for x in result.embedding) + "}"
             self.conn.execute(f"INSERT INTO nodes (id, text, embedding, doc_id) values (%s, %s, %s, %s)", (result.id, result.node.get_text(), embedding, result.doc_id))
+        self.indexed_results.extend(embedding_results)
         return [result.id for result in embedding_results]
 
     def delete(self, doc_id: str, **delete_kwargs: Any) -> None:

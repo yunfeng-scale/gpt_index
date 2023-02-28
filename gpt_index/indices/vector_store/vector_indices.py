@@ -552,3 +552,6 @@ class GPTPostgresIndex(GPTVectorStoreIndex):
             vector_store=vector_store,
             **kwargs,
         )
+
+    def get_vector_store(self):
+        return self._vector_store
