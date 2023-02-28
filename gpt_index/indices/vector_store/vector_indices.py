@@ -507,3 +507,47 @@ class GPTChromaIndex(GPTVectorStoreIndex):
         del query_kwargs["vector_store"]
         vector_store = cast(ChromaVectorStore, self._vector_store)
         query_kwargs["chroma_collection"] = vector_store._collection
+
+class GPTPostgresIndex(GPTVectorStoreIndex):
+    """GPT Postgres Index.
+
+    The GPTChromaIndex is a data structure where nodes are keyed by
+    embeddings, and those embeddings are stored within a Chroma collection.
+    During index construction, the document texts are chunked up,
+    converted to nodes with text; they are then encoded in
+    document embeddings stored within Chroma.
+
+    During query time, the index uses Chroma to query for the top
+    k most similar nodes, and synthesizes an answer from the
+    retrieved nodes.
+
+    Args:
+        text_qa_template (Optional[QuestionAnswerPrompt]): A Question-Answer Prompt
+            (see :ref:`Prompt-Templates`).
+        embed_model (Optional[BaseEmbedding]): Embedding model to use for
+            embedding similarity.
+        chroma_collection (Optional[Any]): Collection instance from `chromadb` package.
+
+    """
+
+    def __init__(
+        self,
+        documents: Optional[Sequence[DOCUMENTS_INPUT]] = None,
+        index_struct: Optional[IndexDict] = None,
+        text_qa_template: Optional[QuestionAnswerPrompt] = None,
+        llm_predictor: Optional[LLMPredictor] = None,
+        embed_model: Optional[BaseEmbedding] = None,
+        **kwargs: Any,
+    ) -> None:
+        """Init params."""
+        vector_store = PostgresVectorStore()
+
+        super().__init__(
+            documents=documents,
+            index_struct=index_struct,
+            text_qa_template=text_qa_template,
+            llm_predictor=llm_predictor,
+            embed_model=embed_model,
+            vector_store=vector_store,
+            **kwargs,
+        )
