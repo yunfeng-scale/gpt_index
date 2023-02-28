@@ -24,7 +24,7 @@ class PostgresVectorStore(VectorStore):
             for more details.
     """
 
-    stores_text: bool = False
+    stores_text: bool = True
     indexed_results: List[NodeEmbeddingResult] = []
 
     def __init__(
