@@ -30,6 +30,7 @@ from gpt_index.vector_stores import (
     ChromaVectorStore,
     FaissVectorStore,
     PineconeVectorStore,
+    PostgresVectorStore,
     QdrantVectorStore,
     SimpleVectorStore,
     WeaviateVectorStore,
