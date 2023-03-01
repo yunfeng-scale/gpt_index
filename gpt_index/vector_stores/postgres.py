@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 
 from gpt_index.indices.query.embedding_utils import get_top_k_embeddings
 from gpt_index.vector_stores.types import (
@@ -26,13 +26,13 @@ class PostgresVectorStore(VectorStore):
 
     stores_text: bool = True
     indexed_results: List[NodeEmbeddingResult] = []
+    pg_session: Session
 
     def __init__(
         self,
         **kwargs: Any,
     ) -> None:
-        self.engine = create_engine("postgresql://postgres:@localhost:5432/llm_index")
-        self.conn = self.engine.connect()
+        self.pg_session = kwargs.get('session')
 
     @property
     def client(self) -> None:
@@ -51,7 +51,8 @@ class PostgresVectorStore(VectorStore):
         """Add embedding_results to index."""
         for result in embedding_results:
             embedding = "{" + ",".join(str(x) for x in result.embedding) + "}"
-            self.conn.execute(f"INSERT INTO nodes (id, text, embedding, doc_id) values (%s, %s, %s, %s)", (result.id, result.node.get_text(), embedding, result.doc_id))
+            self.pg_session.execute(f"INSERT INTO nodes (id, text, embedding, doc_id) values (%s, %s, %s, %s)", (result.id, result.node.get_text(), embedding, result.doc_id))
+        self.pg_session.commit()
         self.indexed_results.extend(embedding_results)
         return [result.id for result in embedding_results]
 
