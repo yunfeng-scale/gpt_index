@@ -51,7 +51,7 @@ class PostgresVectorStore(VectorStore):
         """Add embedding_results to index."""
         for result in embedding_results:
             embedding = "{" + ",".join(str(x) for x in result.embedding) + "}"
-            self.pg_session.execute(f"INSERT INTO nodes (id, text, embedding, doc_id) values (%s, %s, %s, %s)", (result.id, result.node.get_text(), embedding, result.doc_id))
+            self.pg_session.execute(f"INSERT INTO nodes (id, text, embedding, doc_id) values (:id, :text, :embedding, :doc_id)", {"id":result.id, "text":result.node.get_text(), "embedding":embedding, "doc_id":result.doc_id})
         self.pg_session.commit()
         self.indexed_results.extend(embedding_results)
         return [result.id for result in embedding_results]

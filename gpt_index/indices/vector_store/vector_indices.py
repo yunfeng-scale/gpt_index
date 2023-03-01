@@ -541,7 +541,8 @@ class GPTPostgresIndex(GPTVectorStoreIndex):
         **kwargs: Any,
     ) -> None:
         """Init params."""
-        vector_store = PostgresVectorStore()
+        vector_store = PostgresVectorStore(**kwargs)
+        kwargs.pop('session')
 
         super().__init__(
             documents=documents,
